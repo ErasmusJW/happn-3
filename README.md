@@ -901,6 +901,6 @@ gulp --gulpfile test/test-browser/gulp-01.js
 
 
 OTHER PLACES WHERE HAPPN-3 IS USED:
-----------------------------------
+-----------------------------------
 HAPPNER - an experimental application engine that uses happn for its nervous system, see: www.github.com/happner/happner-2 - happner is now on version 2 so relatively mature.
 
