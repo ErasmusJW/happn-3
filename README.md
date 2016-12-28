@@ -894,7 +894,7 @@ service.create(serviceConfig,
 ```
 
 TESTING WITH KARMA
-------------------
+-------------------
 
 testing payload encryption on the browser:
 gulp --gulpfile test/test-browser/gulp-01.js
