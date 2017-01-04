@@ -40,8 +40,13 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
 
   after(function (done) {
 
+    // publisherclient.disconnect({timeout:2000})
+    //   .then(listenerclient.disconnect({timeout:2000}))
+    //   .then(happnInstance.stop())
+    //   .then(done)
+    //   .catch(done);
+
     publisherclient.disconnect({timeout:2000})
-      .then(listenerclient.disconnect({timeout:2000}))
       .then(happnInstance.stop())
       .then(done)
       .catch(done);
