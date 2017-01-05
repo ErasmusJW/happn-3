@@ -44,29 +44,14 @@ describe('2_websockets_embedded_sanity', function () {
 
     this.timeout(20000);
 
-    // publisherclient.disconnect({timeout:2000}, function(e){
-    //
-    //   if (e) console.warn('failed disconnecting publisher');
-    //
-    //   listenerclient.disconnect({timeout:2000}, function(e){
-    //
-    //     if (e) console.warn('failed disconnecting listener');
-    //
-    //     happnInstance.stop(function(e){
-    //
-    //       if (e) console.warn('failed disconnecting instance');
-    //
-    //       done();
-    //     })
-    //   })
-    // });
-
-    //happnInstance.stop().then(done).catch(done);
-
     publisherclient.disconnect({timeout:2000})
-      .then(listenerclient.disconnect({timeout:2000}))
-      .then(happnInstance.stop(done))
-      .catch(done);
+      .then(function(){
+        listenerclient.disconnect({timeout:2000})
+          .then(function(){
+            happnInstance.stop({reconnect:false});
+            done();
+          })
+      });
   });
 
   var publisherclient;
@@ -108,8 +93,13 @@ describe('2_websockets_embedded_sanity', function () {
 
   it('should disconnect the disconnect client', function (callback) {
 
-    disconnectclient.disconnect().then(callback);
+    this.timeout(10000);
 
+    disconnectclient.disconnect({timeout:5000}).then(function(e){
+
+      callback(e);
+
+    });
   });
 
   it('the listener should pick up a single wildcard event', function (callback) {

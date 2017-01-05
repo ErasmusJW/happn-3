@@ -16,13 +16,13 @@ describe('max_message_throughput', function () {
 
   var libFolder = __dirname + sep + 'test-resources' + sep;
 
-  var REMOTE_CLIENT_COUNT = 4;
+  var REMOTE_CLIENT_COUNT = 8;
 
   var TIME = 10 * 1000;
 
   var NOSTORE = "true";
 
-  var NOPUBLISH = "false";
+  var NOPUBLISH = "true";
 
   var SECURE_CONFIG = {
     secure: true
@@ -36,8 +36,8 @@ describe('max_message_throughput', function () {
     services:{
       queue:{
         config:{
-          concurrency:8,
-          outboundConcurrency:20
+          concurrency:16,
+          outboundConcurrency:512
         }
       }
     }

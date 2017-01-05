@@ -40,16 +40,32 @@ describe('3_eventemitter_websockets_embedded_sanity', function () {
 
   after(function (done) {
 
-    // publisherclient.disconnect({timeout:2000})
-    //   .then(listenerclient.disconnect({timeout:2000}))
+    // listenerclient.disconnect({timeout:2000})
+    //   .then(publisherclient.disconnect({timeout:2000}))
     //   .then(happnInstance.stop())
     //   .then(done)
     //   .catch(done);
 
     publisherclient.disconnect({timeout:2000})
-      .then(happnInstance.stop())
-      .then(done)
-      .catch(done);
+    .then(function(){
+      listenerclient.disconnect({timeout:2000})
+        .then(function(){
+          happnInstance.stop({reconnect:false});
+          done();
+        })
+    });
+
+    // listenerclient.disconnect({timeout:2000})
+    //   .then(function(){
+    //     console.log('detached listener');
+    //   })
+    //   .then(publisherclient.disconnect({timeout:2000}))
+    //   .then(function(){
+    //     console.log('detached publisher');
+    //   })
+    //   .then(happnInstance.stop())
+    //   .then(done)
+    //   .catch(done);
   });
 
   var publisherclient;

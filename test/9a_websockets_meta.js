@@ -27,7 +27,9 @@ describe('9a_websockets_meta.js', function () {
 
     publisherclient.disconnect({timeout:2000})
       .then(listenerclient.disconnect({timeout:2000}))
-      .then(happnInstance.stop())
+      .then(function(){
+        happnInstance.stop({reconnect:false});
+      })
       .then(done)
       .catch(done);
 

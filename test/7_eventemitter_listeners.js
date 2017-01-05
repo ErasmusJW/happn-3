@@ -398,7 +398,7 @@ describe('7_eventemitter_listeners', function () {
     });
   });
 
-  it('should subscribe and get initial values emitted immediately', function (callback) {
+  it.only('should subscribe and get initial values emitted immediately', function (callback) {
 
     var caughtEmitted = 0;
 
