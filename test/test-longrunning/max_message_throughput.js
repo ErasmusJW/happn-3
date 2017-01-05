@@ -16,13 +16,13 @@ describe('max_message_throughput', function () {
 
   var libFolder = __dirname + sep + 'test-resources' + sep;
 
-  var REMOTE_CLIENT_COUNT = 8;
+  var REMOTE_CLIENT_COUNT = 6;
 
   var TIME = 10 * 1000;
 
   var NOSTORE = "true";
 
-  var NOPUBLISH = "true";
+  var NOPUBLISH = "false";
 
   var SECURE_CONFIG = {
     secure: true
@@ -32,12 +32,24 @@ describe('max_message_throughput', function () {
 
   };
 
+  //optimal queue sizes, single node
+  // var NON_SECURE_CONFIG_CONCURRENCY = {
+  //   services:{
+  //     queue:{
+  //       config:{
+  //         concurrency:16,
+  //         outboundConcurrency:64
+  //       }
+  //     }
+  //   }
+  // };
+
   var NON_SECURE_CONFIG_CONCURRENCY = {
     services:{
       queue:{
         config:{
           concurrency:16,
-          outboundConcurrency:512
+          outboundConcurrency:64
         }
       }
     }

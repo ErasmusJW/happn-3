@@ -22,6 +22,8 @@ describe('c1_security_pubpriv_login', function () {
   var clientKeyPair1 = crypto.createKeyPair();
   var serverKeyPair = crypto.createKeyPair();
 
+  var PORT = 55010;
+
   /*
    This test demonstrates starting up the happn service -
    the authentication service will use authTokenSecret to encrypt web tokens identifying
@@ -31,6 +33,8 @@ describe('c1_security_pubpriv_login', function () {
   before('should initialize the service', function (callback) {
 
     this.timeout(20000);
+
+    console.log('starting services:::');
 
     try {
       service.create({
@@ -47,14 +51,16 @@ describe('c1_security_pubpriv_login', function () {
           }
         }
       }, function (e, happnInst) {
-        if (e)
-          return callback(e);
+
+        if (e) return callback(e);
 
         happnInstance = happnInst;
 
+        console.log('started service unencrypted:::');
+
         service.create({
           secure: true,
-          port: 10000,
+          port: PORT,
           encryptPayloads: true,
           services: {
             security: {
@@ -66,6 +72,9 @@ describe('c1_security_pubpriv_login', function () {
         }, function (e, happnInst) {
 
           if (e) return callback(e);
+
+          console.log('started service encrypted:::');
+
           encryptedPayloadInstance = happnInst;
           callback();
 
@@ -290,7 +299,7 @@ describe('c1_security_pubpriv_login', function () {
 
     happn.client.create({
         config: {username: '_ADMIN', password: 'happn'},
-        port: 10000,
+        port: PORT,
         secure: true
       })
 
