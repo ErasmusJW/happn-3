@@ -162,3 +162,8 @@
  - happn protocol 0.1.1 in place
  - default protocol is 1.1.0 (oldest)
  
+1.1.2 2017-01-13
+----------------
+
+ - removed benchmarket
+ 

@@ -16,7 +16,7 @@ describe('max_message_throughput', function () {
 
   var libFolder = __dirname + sep + 'test-resources' + sep;
 
-  var REMOTE_CLIENT_COUNT = 6;
+  var REMOTE_CLIENT_COUNT = 5;
 
   var TIME = 10 * 1000;
 
@@ -44,6 +44,24 @@ describe('max_message_throughput', function () {
   //   }
   // };
 
+  //NOSTORE
+  // ended, averages are:  {"tried":49752,"set":49639,"received":27942}
+  // set success: 99.77287345232352
+  // average sets per sec: 4963.9
+  // expected received, based on sets: 297834
+  // actual received: 27942
+  // average received per sec: 2794.2
+  // received success, based on sets: 9.381736134893934
+
+  //STORE
+  // ended, averages are:  {"tried":45342,"set":3651,"received":17663}
+  // set success: 8.052137091438402
+  // average sets per sec: 365.1
+  // expected received, based on sets: 21906
+  // actual received: 17663
+  // average received per sec: 1766.3
+  // received success, based on sets: 80.63087738519127
+
   var NON_SECURE_CONFIG_CONCURRENCY = {
     services:{
       queue:{
@@ -65,7 +83,7 @@ describe('max_message_throughput', function () {
     }
   };
 
-  var CONFIG = NON_SECURE_CONFIG_CONCURRENCY;
+  var CONFIG = NON_SECURE_CONFIG_DIRECT;
 
   var server;
 
@@ -144,6 +162,8 @@ describe('max_message_throughput', function () {
 
     var _this = this;
 
+    this.timeout(60000);
+
     startHappnService(function (e) {
 
       if (e) return done(e);
@@ -156,6 +176,9 @@ describe('max_message_throughput', function () {
 
 
   after(function (done) {
+
+    this.timeout(60000);
+
     stopRemoteClients();
     server.stop(done);
   });

@@ -1,13 +1,13 @@
 {
   "name": "happn-3",
   "description": "pub/sub api as a service using primus and mongo & redis or nedb, can work as cluster, single process or embedded using nedb",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "./lib/index",
   "protocol": "1.2.0",
   "scripts": {
-    "test": "mocha silence.js test --benchmarket-off",
-    "test-cover": "istanbul cover _mocha -- silence.js test --benchmarket-off",
-    "test-memory": "mocha --expose-gc test/test-memory --benchmarket-off",
+    "test": "mocha silence.js test",
+    "test-cover": "istanbul cover _mocha -- silence.js test",
+    "test-memory": "mocha --expose-gc test/test-memory",
     "test-benchmarket": "node --expose-gc test/lib/serial-run"
   },
   "author": "Tenacious and NSOFT",
@@ -53,7 +53,6 @@
     "ws": "1.0.1"
   },
   "devDependencies": {
-    "benchmarket": "0.2.0",
     "byline": "5.0.0",
     "chai": "^3.5.0",
     "coveralls": "^2.11.6",
