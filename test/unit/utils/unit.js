@@ -3,7 +3,7 @@ var expect = require('expect.js');
 var Utils = require('../../../lib/services/utils/service');
 var utils = new Utils();
 
-describe(require('../../__fixtures/utils/test_helper').create().testName(__filename, 3), function () {
+describe.only(require('../../__fixtures/utils/test_helper').create().testName(__filename, 3), function () {
 
   it('tests mergeObjects', function (done) {
 
