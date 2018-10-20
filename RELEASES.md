@@ -489,3 +489,7 @@
 7.3.0 2018-08-23
 ----------------
   - feature: getUsersByGroup
+
+7.3.1 2018-08-23
+----------------
+  - fix: nedb provider clones incoming data
