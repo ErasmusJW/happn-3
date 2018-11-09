@@ -196,13 +196,10 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
   it('tests the __onVariableDepth method, bad paths 1', function(done){
     var happnClient = mockHappnClient();
 
-    console.log('testing:::', '/test/path**/1');
     happnClient.__onVariableDepth('/test/path**/1', { depth:4 }, function(data){}, function(e, handle){
       expect(e.toString()).to.be('Error: variable depth segments must either be trailing, or be enclosed by segment delimiters /, ie: /my/test/** or /my/**/test is ok, this is not ok: /my/tes**/1');
-      console.log('testing:::', '/test/**/**');
       happnClient.__onVariableDepth('/test/**/**', { depth:4 }, function(data){}, function(e1, handle){
         expect(e1.toString()).to.be('Error: variable depth subscription paths can only have one variable depth segment, ie: this is not ok /my/test/**/path/**');
-        console.log('testing:::', '/test/**/**/1');
         happnClient.__onVariableDepth('/test/**/**/1', { depth:4 }, function(data){}, function(e2, handle){
           expect(e2.toString()).to.be('Error: variable depth subscription paths can only have one variable depth segment, ie: this is not ok /my/test/**/path/**');
           done();
