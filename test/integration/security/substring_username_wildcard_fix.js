@@ -33,7 +33,7 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
     });
   });
 
-  const USERNAME = 'abcdefghijklmnopqrstuvwxyz';
+  var USERNAME = 'abcdefghijklmnopqrstuvwxyz';
 
   before('creates 20 users with substring usernames', function (done) {
 
@@ -86,16 +86,18 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
       var searchPath = userPath + '*';
 
+      var _this = this;
+
       //TAKEN OUT TO PROVE TEST
       // var cachedUser = this.__cache_users.getSync(userName);
       //
       // if (cachedUser) return callback(null, cachedUser);
 
-      this.dataService.get(searchPath, {
+      _this.dataService.get(searchPath, {
         sort: {
           'path': 1
         }
-      }, (e, results) => {
+      }, function (e, results) {
 
         if (e) return callback(e);
 
@@ -105,12 +107,12 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
         var password = null;
         var groups = {};
 
-        results.forEach((userItem, userItemIndex) => {
+        results.forEach(function(userItem, userItemIndex) {
 
           if (userItem.data && userItem.data.username) {
             //if (userItem.data.username != userName) return;//ignore similar usernames due to wildcard TAKEN OUT TO PROVE TEST
             password = userItem.data.password;
-            user = this.securityService.serialize('user', userItem, options);
+            user = _this.securityService.serialize('user', userItem, options);
             return;
           }
 
@@ -126,8 +128,8 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
         user.groups = groups;
 
-        this.__cache_users.setSync(userName, user);
-        this.__cache_passwords.setSync(userName, password);
+        _this.__cache_users.setSync(userName, user);
+        _this.__cache_passwords.setSync(userName, password);
 
         callback(null, user);
       });
