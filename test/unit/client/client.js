@@ -159,4 +159,94 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
     }
   });
 
+  it('tests the __getVariableDepthPermutations method', function(){
+
+    var happnClient = mockHappnClient();
+
+    expect(happnClient.__getVariableDepthPermutationPaths('/my/test/**/1', 5)).to.eql(
+      [
+        '/my/test/*/1',
+        '/my/test/*/*/1',
+        '/my/test/*/*/*/1',
+        '/my/test/*/*/*/*/1',
+        '/my/test/*/*/*/*/*/1',
+      ]
+    );
+
+    expect(happnClient.__getVariableDepthPermutationPaths('/my/test/1/**', 6, true)).to.eql(
+      [
+        '/my/test/1/*',
+        '/my/test/1/*/*',
+        '/my/test/1/*/*/*',
+        '/my/test/1/*/*/*/*',
+        '/my/test/1/*/*/*/*/*',
+        '/my/test/1/*/*/*/*/*/*',
+      ]
+    );
+
+    expect(happnClient.__getVariableDepthPermutationPaths('/my/test/1/**', 3, true)).to.eql(
+      [
+        '/my/test/1/*',
+        '/my/test/1/*/*',
+        '/my/test/1/*/*/*'
+      ]
+    );
+  });
+
+  it('tests the __onVariableDepth method, bad paths 1', function(done){
+    var happnClient = mockHappnClient();
+
+    console.log('testing:::', '/test/path**/1');
+    happnClient.__onVariableDepth('/test/path**/1', { depth:4 }, function(data){}, function(e, handle){
+      expect(e.toString()).to.be('Error: variable depth segments must either be trailing, or be enclosed by segment delimiters /, ie: /my/test/** or /my/**/test is ok, this is not ok: /my/tes**/1');
+      console.log('testing:::', '/test/**/**');
+      happnClient.__onVariableDepth('/test/**/**', { depth:4 }, function(data){}, function(e1, handle){
+        expect(e1.toString()).to.be('Error: variable depth subscription paths can only have one variable depth segment, ie: this is not ok /my/test/**/path/**');
+        console.log('testing:::', '/test/**/**/1');
+        happnClient.__onVariableDepth('/test/**/**/1', { depth:4 }, function(data){}, function(e2, handle){
+          expect(e2.toString()).to.be('Error: variable depth subscription paths can only have one variable depth segment, ie: this is not ok /my/test/**/path/**');
+          done();
+        });
+      });
+    });
+  });
+
+  it('tests the __onVariableDepth method, trailing then off', function(){
+
+    var happnClient = mockHappnClient();
+
+    happnClient.__onVariableDepth('/test/path/**', { depth:4 }, function(data){
+
+    }, function(e, handle){
+
+      if (e) return done(e);
+
+      expect(happnClient.state.__variableDepthSubscriptions[handle]).to.eql([
+
+      ]);
+
+      expect(happnClient.state.listenerRefs[handle]).to.eql([
+
+      ]);
+
+      expect(happnClient.state.listenerRefs).to.eql({
+
+      });
+
+      happnClient.off(handle, function(e){
+
+        if (e) return done(e);
+
+        expect(happnClient.__variableDepthSubscriptions[handle]).to.eql(undefined);
+
+        expect(happnClient.state.listenerRefs[handle]).to.eql(undefined);
+
+        expect(happnClient.state.listenerRefs).to.eql({
+
+        });
+
+        done();
+      });
+    });
+  });
 });
