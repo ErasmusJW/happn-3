@@ -493,3 +493,8 @@
 7.3.1 2018-08-23
 ----------------
   - fix: nedb provider clones incoming data
+
+7.3.2 2018-11-09
+----------------
+  - fix: protocol fail for encrypted payloads issue
+  - fix: security, users that are substrings of other users get returned by getUser
