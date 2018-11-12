@@ -163,54 +163,50 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
     var happnClient = mockHappnClient();
 
-    expect(happnClient.__getVariableDepthPermutationPaths('/my/test/**/1', 5)).to.eql(
+    expect(happnClient.__getVariableDepthPermutationPaths('/my/test/**', 5)).to.eql(
       [
-        '/my/test/*/1',
-        '/my/test/*/*/1',
-        '/my/test/*/*/*/1',
-        '/my/test/*/*/*/*/1',
-        '/my/test/*/*/*/*/*/1',
+        '/my/test/*',
+        '/my/test/*/*',
+        '/my/test/*/*/*',
+        '/my/test/*/*/*/*',
+        '/my/test/*/*/*/*/*',
       ]
     );
 
-    expect(happnClient.__getVariableDepthPermutationPaths('/my/test/1/**', 6, true)).to.eql(
+    expect(happnClient.__getVariableDepthPermutationPaths('/my/test/*/**', 5)).to.eql(
       [
-        '/my/test/1/*',
-        '/my/test/1/*/*',
-        '/my/test/1/*/*/*',
-        '/my/test/1/*/*/*/*',
-        '/my/test/1/*/*/*/*/*',
-        '/my/test/1/*/*/*/*/*/*',
+        '/my/test/*/*',
+        '/my/test/*/*/*',
+        '/my/test/*/*/*/*',
+        '/my/test/*/*/*/*/*',
+        '/my/test/*/*/*/*/*/*',
       ]
     );
 
-    expect(happnClient.__getVariableDepthPermutationPaths('/my/test/1/**', 3, true)).to.eql(
+    expect(happnClient.__getVariableDepthPermutationPaths('/my/*/1/**', 5)).to.eql(
       [
-        '/my/test/1/*',
-        '/my/test/1/*/*',
-        '/my/test/1/*/*/*'
+        '/my/*/1/*',
+        '/my/*/1/*/*',
+        '/my/*/1/*/*/*',
+        '/my/*/1/*/*/*/*',
+        '/my/*/1/*/*/*/*/*',
       ]
     );
   });
 
-  it('tests the __onVariableDepth method, bad paths 1', function(done){
-    var happnClient = mockHappnClient();
+  var refId = 1;
 
-    happnClient.__onVariableDepth('/test/path**/1', { depth:4 }, function(data){}, function(e, handle){
-      expect(e.toString()).to.be('Error: variable depth segments must either be trailing, or be enclosed by segment delimiters /, ie: /my/test/** or /my/**/test is ok, this is not ok: /my/tes**/1');
-      happnClient.__onVariableDepth('/test/**/**', { depth:4 }, function(data){}, function(e1, handle){
-        expect(e1.toString()).to.be('Error: variable depth subscription paths can only have one variable depth segment, ie: this is not ok /my/test/**/path/**');
-        happnClient.__onVariableDepth('/test/**/**/1', { depth:4 }, function(data){}, function(e2, handle){
-          expect(e2.toString()).to.be('Error: variable depth subscription paths can only have one variable depth segment, ie: this is not ok /my/test/**/path/**');
-          done();
-        });
-      });
-    });
-  });
-
-  it('tests the __onVariableDepth method, trailing then off', function(){
+  it('tests the __onVariableDepth method, then off', function(done){
 
     var happnClient = mockHappnClient();
+
+    happnClient._remoteOn = function(path, parameters, callback) {
+      callback(null, {id:refId++});
+    }
+
+    happnClient._remoteOff = function(channel, listenerRef, callback) {
+      callback();
+    }
 
     happnClient.__onVariableDepth('/test/path/**', { depth:4 }, function(data){
 
@@ -218,30 +214,78 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
       if (e) return done(e);
 
+      expect(handle).to.be(0);
+
       expect(happnClient.state.__variableDepthSubscriptions[handle]).to.eql([
-
-      ]);
-
-      expect(happnClient.state.listenerRefs[handle]).to.eql([
-
+        1,2,3,4
       ]);
 
       expect(happnClient.state.listenerRefs).to.eql({
-
+        "{\"path\":\"/ALL@/test/path/*\",\"event_type\":\"all\",\"count\":0}": 1,
+        "{\"path\":\"/ALL@/test/path/*/*\",\"event_type\":\"all\",\"count\":0}": 2,
+        "{\"path\":\"/ALL@/test/path/*/*/*\",\"event_type\":\"all\",\"count\":0}": 3,
+        "{\"path\":\"/ALL@/test/path/*/*/*/*\",\"event_type\":\"all\",\"count\":0}": 4
       });
 
       happnClient.off(handle, function(e){
 
         if (e) return done(e);
 
-        expect(happnClient.__variableDepthSubscriptions[handle]).to.eql(undefined);
+        expect(happnClient.state.__variableDepthSubscriptions[handle]).to.eql(undefined);
 
         expect(happnClient.state.listenerRefs[handle]).to.eql(undefined);
 
-        expect(happnClient.state.listenerRefs).to.eql({
+        expect(happnClient.state.listenerRefs).to.eql({});
 
-        });
+        done();
+      });
+    });
+  });
 
+  var failedRefId = 1;
+
+  it('tests the .on method failure in _remoteOn with variable depth', function(done){
+
+    var happnClient = mockHappnClient();
+
+    happnClient._remoteOn = function(path, parameters, callback) {
+
+      if (failedRefId == 3) return callback(new Error('test error'));
+      callback(null, {id:failedRefId++});
+    }
+
+    happnClient.on('/test/path/**', { depth:4 }, function(data){
+
+    }, function(e){
+      expect(e.toString()).to.be('Error: test error');
+      done();
+    });
+  });
+
+  var failedRefOffId = 1;
+
+  it('tests the .on method failure in _remoteOff with variable depth', function(done){
+
+    var happnClient = mockHappnClient();
+
+    happnClient._remoteOn = function(path, parameters, callback) {
+      callback(null, {id:failedRefOffId++});
+    }
+
+    happnClient._remoteOff = function(channel, listenerRef, callback) {
+      if (listenerRef == 3) return callback(new Error('test error'));
+      callback(null, {id:listenerRef++});
+    }
+
+    happnClient.on('/test/path/**', { depth:4 }, function(data){
+
+    }, function(e, handle){
+
+      if (e) return done(e);
+
+      happnClient.off(handle, function(e){
+
+        expect(e.toString()).to.be('Error: test error');
         done();
       });
     });
