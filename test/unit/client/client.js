@@ -216,8 +216,8 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
       expect(handle).to.be(0);
 
-      expect(happnClient.state.__variableDepthSubscriptions[handle]).to.eql([
-        1,2,3,4
+      expect(happnClient.state.variableDepthSubscriptions[handle]).to.eql([
+        1,2,3
       ]);
 
       expect(happnClient.state.listenerRefs).to.eql({
@@ -231,7 +231,7 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
         if (e) return done(e);
 
-        expect(happnClient.state.__variableDepthSubscriptions[handle]).to.eql(undefined);
+        expect(happnClient.state.variableDepthSubscriptions[handle]).to.eql(undefined);
 
         expect(happnClient.state.listenerRefs[handle]).to.eql(undefined);
 

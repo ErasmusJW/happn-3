@@ -73,7 +73,7 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
         if (e) return done(e);
 
-        expect(listenerclient.state.__variableDepthSubscriptions[variableDepthHandle]).to.eql(undefined);
+        expect(listenerclient.state.variableDepthSubscriptions[variableDepthHandle]).to.eql(undefined);
 
         expect(listenerclient.state.listenerRefs[variableDepthHandle]).to.eql(undefined);
 
@@ -88,8 +88,8 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
       expect(handle).to.be(0);
 
-      expect(listenerclient.state.__variableDepthSubscriptions[handle]).to.eql([
-        1,2,3,4
+      expect(listenerclient.state.variableDepthSubscriptions[handle]).to.eql([
+        1,2,3
       ]);
 
       expect(Object.keys(listenerclient.state.listenerRefs).length).to.eql(4);
@@ -114,7 +114,7 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
         if (e) return done(e);
 
-        expect(listenerclient.state.__variableDepthSubscriptions[variableDepthHandle]).to.eql(undefined);
+        expect(listenerclient.state.variableDepthSubscriptions[variableDepthHandle]).to.eql(undefined);
 
         expect(listenerclient.state.listenerRefs[variableDepthHandle]).to.eql(undefined);
 
@@ -129,8 +129,8 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
       expect(handle).to.be(0);
 
-      expect(listenerclient.state.__variableDepthSubscriptions[handle]).to.eql([
-        1,2,3,4
+      expect(listenerclient.state.variableDepthSubscriptions[handle]).to.eql([
+        1,2,3
       ]);
 
       expect(Object.keys(listenerclient.state.listenerRefs).length).to.eql(4);
@@ -139,6 +139,71 @@ describe(require('../../__fixtures/utils/test_helper').create().testName(__filen
 
       publisherclient.set('/test/path/1/3', {set:'data'}, function(e){
         if (e) return done(e);
+      });
+    });
+  });
+
+  it('does a couple of variable depth ons, we disconnect the client and ensure the state is cleaned up', function(done){
+
+    listenerclient.on('/test/path/**', { depth:4 }, function(data){}, function(e, handle1){
+
+      listenerclient.on('/test/path/1/**', { depth:5 }, function(data){}, function(e, handle2){
+
+        expect(listenerclient.state.variableDepthSubscriptions[handle1]).to.eql([
+          1,2,3
+        ]);
+
+        expect(listenerclient.state.variableDepthSubscriptions[handle2]).to.eql([
+          5,6,7,8
+        ]);
+
+        expect(Object.keys(listenerclient.state.listenerRefs).length).to.eql(9);
+
+        listenerclient.disconnect(function(e){
+
+          if (e) return done(e);
+
+          expect(listenerclient.state.variableDepthSubscriptions[handle1]).to.eql(undefined);
+
+          expect(listenerclient.state.variableDepthSubscriptions[handle2]).to.eql(undefined);
+
+          expect(Object.keys(listenerclient.state.listenerRefs).length).to.eql(0);
+
+          done();
+
+        });
+      });
+    });
+  });
+
+  it('does a variable depth on which eclipses another .on, do off and ensure the correct handlers are called', function(done){
+
+    var variableDepthHandle;
+    var results = [];
+
+    listenerclient.on('/test/path/**', { depth:4 }, function(data, meta){
+      results.push({data:data, channel:meta.channel});
+    }, function(e, handle1){
+      if (e) return done(e);
+      listenerclient.on('/test/path/1/**', { depth:4 }, function(data, meta){
+        results.push({data:data, channel:meta.channel});
+      }, function(e, handle2){
+        if (e) return done(e);
+        publisherclient.set('/test/path/1/1', {set:1}, function(e){
+          if (e) return done(e);
+          listenerclient.off(handle1, function(e){
+            if (e) return done(e);
+            publisherclient.set('/test/path/1/1', {set:2}, function(e){
+              if (e) return done(e);
+              expect(results).to.eql([
+                { data: { set: 1 }, channel: '/ALL@/test/path/1/*' },
+                { data: { set: 1 }, channel: '/ALL@/test/path/*/*' },
+                { data: { set: 2 }, channel: '/ALL@/test/path/1/*' }]
+              );
+              done();
+            });
+          });
+        });
       });
     });
   });
