@@ -549,6 +549,20 @@
 ----------------
   - fix: happn_1.3.0 protocol backward compatibility - outbound
 
+8.2.5 2019-01-18
+----------------
+  - fix: listUserNamesByGroup does not work on mongodb (issue 180 workaround)
+
+8.2.6 2019-01-24
+----------------
+  - issue #184 fix: cannot read status of null in .on response of client
+  - lru cache issue
+
+8.2.7 2019-02-01
+----------------
+  - client now disregards permission change errors when reattaching sessions
+  - using dezalgo in more obvious security methods that early exit with callbacks
+
 8.3.0 2019-01-15
 ----------------
   - feature: protocol update, happn 4
